@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-02
+
+### Added
+- Auto-detection of MCP and RTK capabilities to conditionally expose related UI/config controls.
+
+### Changed
+- `/tool-display` modal now hides MCP settings when MCP tooling is unavailable.
+- `/tool-display` modal now hides RTK compaction hint settings when RTK optimizer is unavailable.
+- Runtime rendering now force-disables MCP output mode and RTK hint rendering when those capabilities are unavailable.
+- Native user message box is now user-configurable via `enableNativeUserMessageBox` in config and `/tool-display` settings.
+
 ## [0.1.3] - 2026-03-02
 
 ### Added

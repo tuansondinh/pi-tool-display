@@ -10,12 +10,13 @@ OpenCode-style tool rendering for the Pi coding agent.
 
 - Compact rendering for `read`, `grep`, `find`, `ls`, `bash`, `edit`, and `write`
 - Optional per-tool override ownership toggles (`read`, `grep`, `find`, `ls`, `bash`, `edit`, `write`) for extension compatibility
+- MCP and RTK-specific settings auto-hide/auto-disable when those capabilities are not available
 - Presets for output verbosity: `opencode`, `balanced`, `verbose`
 - Interactive settings modal via `/tool-display`
 - Command-based controls (`show`, `reset`, `preset ...`)
 - Diff renderer with adaptive split/unified mode and inline highlights
 - Optional truncation and RTK compaction hints
-- Native bordered user message box styling
+- Native bordered user message box styling (configurable on/off)
 
 ## Installation
 
@@ -86,14 +87,18 @@ Important compatibility config:
     "bash": true,
     "edit": true,
     "write": true
-  }
+  },
+  "enableNativeUserMessageBox": true
 }
 ```
 
 - Each flag controls whether `pi-tool-display` registers that built-in tool override.
 - Set any tool to `false` to leave ownership to another extension.
+- `enableNativeUserMessageBox` controls whether bordered user prompt rendering is enabled.
 - Changing ownership values requires `/reload` to apply.
 - Legacy `registerReadToolOverride` is still accepted for backward compatibility and maps to `registerToolOverrides.read`.
+- If MCP tooling is unavailable, MCP output controls are hidden and MCP output mode is forced to `hidden`.
+- If RTK optimizer is unavailable, RTK compaction hint controls are hidden and RTK hint rendering is forced off.
 
 Values are normalized and clamped on load/save to avoid invalid settings.
 
@@ -104,6 +109,10 @@ If another extension owns one of these tools (`read`, `grep`, `find`, `ls`, `bas
 1. Set the corresponding `registerToolOverrides.<tool>` value to `false` in your config.
 2. Run `/reload` in Pi.
 3. Verify with `/tool-display show` that `owners={...}` reflects the expected `off` values.
+
+## Related Extension
+
+- RTK optimizer: [pi-rtk-optimizer](https://github.com/MasuRii/pi-rtk-optimizer)
 
 ## Development
 
@@ -121,6 +130,7 @@ npm run check
 - `src/tool-overrides.ts` - built-in and MCP renderer overrides
 - `src/diff-renderer.ts` - edit/write diff rendering engine
 - `src/config-modal.ts` - `/tool-display` settings UI
+- `src/capabilities.ts` - MCP/RTK capability detection and runtime config guards
 - `src/config-store.ts` - config load/save and normalization
 - `src/presets.ts` - preset definitions and matching
 - `src/render-utils.ts` - shared rendering helpers
