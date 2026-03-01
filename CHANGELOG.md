@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-03-01
+
+### Fixed
+- Corrected `write` call rendering state handling so path changes without new content no longer reuse stale line/size metadata from previous writes.
+- Restored write call suffix rendering (`(X lines, Y)`) when content is available, improving call summary consistency.
+
 ## [0.1.1] - 2026-03-01
 
 ### Changed

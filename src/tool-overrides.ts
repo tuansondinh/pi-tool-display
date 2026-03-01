@@ -892,14 +892,34 @@ export function registerToolDisplayOverrides(
       );
     },
     renderCall(args, theme) {
-      lastWritePath = typeof args.path === "string" ? args.path : undefined;
-      lastWriteContent =
+      const incomingPath = typeof args.path === "string" ? args.path : undefined;
+      const incomingContent =
         typeof args.content === "string" ? args.content : undefined;
-      lastWriteLineCount = countWriteContentLines(args.content);
-      lastWriteSizeBytes = getWriteContentSizeBytes(args.content);
+
+      if (incomingPath !== undefined) {
+        const pathChanged = incomingPath !== lastWritePath;
+        lastWritePath = incomingPath;
+
+        if (pathChanged && incomingContent === undefined) {
+          lastWriteContent = undefined;
+          lastWriteLineCount = 0;
+          lastWriteSizeBytes = 0;
+        }
+      }
+
+      if (incomingContent !== undefined) {
+        lastWriteContent = incomingContent;
+        lastWriteLineCount = countWriteContentLines(incomingContent);
+        lastWriteSizeBytes = getWriteContentSizeBytes(incomingContent);
+      }
+
       const path = shortenPath(lastWritePath);
+      const suffix =
+        incomingContent !== undefined || lastWriteContent !== undefined
+          ? formatWriteCallSuffix(lastWriteLineCount, lastWriteSizeBytes, theme)
+          : "";
       return new Text(
-        `${theme.fg("toolTitle", theme.bold("write"))} ${theme.fg("accent", path || "...")}`,
+        `${theme.fg("toolTitle", theme.bold("write"))} ${theme.fg("accent", path || "...")}${suffix}`,
         0,
         0,
       );
