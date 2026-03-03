@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-03-04
+
+### Added
+- Thinking labels feature that prefixes AI reasoning blocks with themed "Thinking:" labels for better readability
+
+### Changed
+- Rewrote README.md with professional documentation standards
+- Added comprehensive feature documentation, configuration reference, and usage examples
+- Simplified settings modal by removing less-used advanced options (expandedPreviewMaxLines, diffSplitMinWidth, diffCollapsedLines, tool ownership toggles)
+
 ## [0.1.4] - 2026-03-02
 
 ### Added
