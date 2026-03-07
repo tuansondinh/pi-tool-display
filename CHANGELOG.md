@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-03-07
+
+### Added
+- Added line-width safety utilities for diff rendering so collapsed and expanded diff output can be clamped to the current pane width.
+- Added utility test coverage for write display helpers, native user message box helpers, and narrow-width diff hint behavior.
+
+### Changed
+- Updated README documentation to reflect the current command surface, config model, width-safe diff behavior, native user message box pipeline, and project structure.
+- Refactored native user message box rendering into focused markdown, patching, renderer, and ANSI/background utility modules.
+
+### Fixed
+- Prevented diff rendering and collapsed diff hints from overflowing narrow terminal widths by progressively shortening hint text and clamping rendered lines.
+- Preserved inline `write` call summaries with line-count and byte-size metadata when content is available.
+- Prevented thinking label presentation changes from leaking into future assistant context by sanitizing stored thinking blocks during the `context` extension event.
+- Hardened thinking label normalization to strip ANSI residue fragments such as `38;5;208m` before display formatting.
+- Restored final-message thinking label persistence on `message_end` so themed labels remain consistent after streaming and across session reloads.
+- Improved native user message box rendering so markdown content, ANSI-only blank lines, and background fill behave more consistently.
+
 ## [0.1.6] - 2026-03-04
 
 ### Fixed
