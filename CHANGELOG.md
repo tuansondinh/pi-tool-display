@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-03-12
+
+### Changed
+- Extracted diff presentation logic into dedicated `diff-presentation.ts` module with `DiffPresentationMode`, `buildDiffSummaryText`, `normalizeDiffRenderWidth`, and `resolveDiffPresentationMode` utilities
+- Improved compact line rendering with dedicated marker and prefix functions
+- Added width-safe diff rendering utilities for consistent terminal width handling
+
 ## [0.1.7] - 2026-03-07
 
 ### Added
