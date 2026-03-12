@@ -146,28 +146,9 @@ function toSgrParams(rawParams: string): number[] {
 	return parsed.length > 0 ? parsed : [];
 }
 
-function sequenceAffectsBackground(params: number[]): boolean {
-	for (let index = 0; index < params.length; index++) {
-		const param = params[index] ?? 0;
-
+function sequenceResetsBackground(params: number[]): boolean {
+	for (const param of params) {
 		if (param === 0 || param === 49) {
-			return true;
-		}
-
-		if ((param >= 40 && param <= 47) || (param >= 100 && param <= 107)) {
-			return true;
-		}
-
-		if (param === 48) {
-			const colorMode = params[index + 1];
-			if (colorMode === 5) {
-				index += 2;
-				return true;
-			}
-			if (colorMode === 2) {
-				index += 4;
-				return true;
-			}
 			return true;
 		}
 	}
@@ -1134,7 +1115,7 @@ function keepBackgroundAcrossResets(text: string, rowBg: string): string {
 
 	return text.replace(ANSI_SGR_PATTERN, (sequence, rawParams: string) => {
 		const params = toSgrParams(rawParams);
-		if (params.length === 0 || !sequenceAffectsBackground(params)) {
+		if (params.length === 0 || !sequenceResetsBackground(params)) {
 			return sequence;
 		}
 		return `${sequence}${rowBg}`;

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-03-13
+
+### Changed
+- Refactored `sequenceAffectsBackground` to `sequenceResetsBackground` with simpler logic that only detects background reset sequences (codes 0 and 49)
+
+### Tests
+- Added test coverage for diff-renderer width handling
+
 ## [0.1.10] - 2026-03-13
 
 ### Fixed

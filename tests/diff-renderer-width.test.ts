@@ -16,6 +16,45 @@ const theme = {
 	bold: (text: string): string => text,
 };
 
+interface RgbColor {
+	r: number;
+	g: number;
+	b: number;
+}
+
+const ADDITION_TINT_TARGET: RgbColor = { r: 84, g: 190, b: 118 };
+const DELETION_TINT_TARGET: RgbColor = { r: 232, g: 95, b: 122 };
+const ADD_ROW_BACKGROUND_MIX_RATIO = 0.24;
+const REMOVE_ROW_BACKGROUND_MIX_RATIO = 0.12;
+const ADD_INLINE_EMPHASIS_MIX_RATIO = 0.44;
+
+function mixRgb(base: RgbColor, tint: RgbColor, ratio: number): RgbColor {
+	const clamped = Math.max(0, Math.min(1, ratio));
+	return {
+		r: base.r * (1 - clamped) + tint.r * clamped,
+		g: base.g * (1 - clamped) + tint.g * clamped,
+		b: base.b * (1 - clamped) + tint.b * clamped,
+	};
+}
+
+function rgbToBgAnsi(color: RgbColor): string {
+	return `\x1b[48;2;${Math.round(color.r)};${Math.round(color.g)};${Math.round(color.b)}m`;
+}
+
+function resolveInlineHighlightPalette(baseBg: RgbColor, addFg: RgbColor, removeFg: RgbColor): {
+	addRowBg: string;
+	removeRowBg: string;
+	addEmphasisBg: string;
+} {
+	const addTint = mixRgb(addFg, ADDITION_TINT_TARGET, 0.35);
+	const removeTint = mixRgb(removeFg, DELETION_TINT_TARGET, 0.65);
+	return {
+		addRowBg: rgbToBgAnsi(mixRgb(baseBg, addTint, ADD_ROW_BACKGROUND_MIX_RATIO)),
+		removeRowBg: rgbToBgAnsi(mixRgb(baseBg, removeTint, REMOVE_ROW_BACKGROUND_MIX_RATIO)),
+		addEmphasisBg: rgbToBgAnsi(mixRgb(baseBg, addTint, ADD_INLINE_EMPHASIS_MIX_RATIO)),
+	};
+}
+
 function renderInsideToolBox(component: Component, width: number): string[] {
 	const box = new Box(1, 1);
 	box.addChild(component);
@@ -101,4 +140,58 @@ test("write overwrite diff renderer falls back when the overwrite matrix would b
 	const lines = renderInsideToolBox(component, 80);
 	assertLinesFitWidth(lines, 80);
 	assert.match(lines.join("\n"), /overwrite diff omitted/i);
+});
+
+test("inline emphasis backgrounds remain visible while row backgrounds still recover after resets", () => {
+	const baseBg = { r: 10, g: 20, b: 30 };
+	const addFg = { r: 100, g: 150, b: 200 };
+	const removeFg = { r: 200, g: 100, b: 120 };
+	const palette = resolveInlineHighlightPalette(baseBg, addFg, removeFg);
+	const splitDiffConfig = { ...diffConfig, diffViewMode: "split" };
+	const ansiTheme = {
+		fg: (_color: string, text: string): string => `\x1b[38;2;1;2;3m${text}\x1b[0m`,
+		bold: (text: string): string => text,
+		getFgAnsi: (slot: string): string | undefined => {
+			if (slot === "toolDiffAdded") {
+				return `\x1b[38;2;${addFg.r};${addFg.g};${addFg.b}m`;
+			}
+			if (slot === "toolDiffRemoved") {
+				return `\x1b[38;2;${removeFg.r};${removeFg.g};${removeFg.b}m`;
+			}
+			return undefined;
+		},
+		getBgAnsi: (slot: string): string | undefined => {
+			if (slot === "toolSuccessBg") {
+				return `\x1b[48;2;${baseBg.r};${baseBg.g};${baseBg.b}m`;
+			}
+			return undefined;
+		},
+	};
+	const component = renderEditDiffResult(
+		{
+			diff: "--- a/demo.txt\n+++ b/demo.txt\n@@ -1 +1 @@\n-keep before suffix\n+keep after suffix\n",
+		},
+		{ expanded: true, filePath: "demo.txt" },
+		splitDiffConfig as any,
+		ansiTheme,
+		"",
+	);
+
+	const lines = renderInsideToolBox(component, 120);
+	const addedLine = lines.find((line) => line.includes("after"));
+	assert.ok(addedLine, "expected an added line containing the inline-emphasized text");
+	assert.ok(
+		addedLine.includes(`${palette.addEmphasisBg}after${palette.addRowBg}`),
+		`expected inline emphasis background to remain active for the changed span: ${JSON.stringify(addedLine)}`,
+	);
+	assert.ok(
+		!addedLine.includes(`${palette.addEmphasisBg}${palette.addRowBg}after`),
+		`expected row background not to overwrite the inline emphasis span immediately: ${JSON.stringify(addedLine)}`,
+	);
+	const stabilizedResetAnsi = "\x1b[39;22;23;24;25;27;28;29;59m";
+	assert.ok(
+		addedLine.includes(`${stabilizedResetAnsi}${palette.addRowBg}`)
+			|| addedLine.includes(`${stabilizedResetAnsi}${palette.removeRowBg}`),
+		`expected row background to be restored after reset sequences: ${JSON.stringify(addedLine)}`,
+	);
 });
