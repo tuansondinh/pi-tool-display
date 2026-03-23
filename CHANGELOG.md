@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-03-23
+
+### Added
+- `tool-metadata.ts` module with shared utilities: `toRecord`, `getTextField`, `isMcpToolCandidate`, `extractPromptMetadata`
+- `cloneToolParameters` function to deep-copy built-in tool parameter schemas for extension renderers
+- Comprehensive tests for MCP detection, config guards, output modes, and metadata cloning
+- Plural label support in search summaries
+- Conditional truncation hints via `showTruncationHints` config (defaults to `false`)
+- Keywords for better npm discoverability: `hide`, `collapse`, `truncate`, `compact`, `diff`, `output-mode`
+
+### Changed
+- Updated `@mariozechner/pi-coding-agent` and `@mariozechner/pi-tui` peer dependencies to ^0.62.0
+- Extracted shared utilities to dedicated `tool-metadata.ts` module for reuse across capabilities and tool-overrides
+- Refactored tool-overrides to preserve `promptSnippet` and `promptGuidelines` on overridden read, edit, and write tools
+- Improved diff renderer with accurate line number tracking and line number delta calculation for proper hunk tracking
+- Removed Windows path normalization from system prompt sanitizer working-directory handling
+- Simplified system prompt sanitizer to only handle documentation removal
+- Enhanced package description to highlight hide/collapse/truncate capabilities for better npm discovery
+
+### Tests
+- Added test suites for diff renderer numbering and wrap handling
+- Added tests for tool-overrides config and registration behavior
+- Added tests for capabilities module with MCP detection scenarios
+
 ## [0.1.11] - 2026-03-13
 
 ### Changed

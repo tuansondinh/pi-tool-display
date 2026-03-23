@@ -1,7 +1,7 @@
 {
   "name": "pi-tool-display",
-  "version": "0.1.11",
-  "description": "OpenCode-style tool call/result rendering extension for Pi coding agent.",
+  "version": "0.1.12",
+  "description": "Compact tool call rendering, diff visualization, and output truncation extension for Pi coding agent. Hides, collapses, and truncates verbose tool output for cleaner TUI display.",
   "type": "module",
   "main": "./index.ts",
   "exports": {
@@ -28,7 +28,13 @@
     "pi-extension",
     "tool-rendering",
     "tui",
-    "coding-agent"
+    "coding-agent",
+    "hide",
+    "collapse",
+    "truncate",
+    "compact",
+    "diff",
+    "output-mode"
   ],
   "author": "MasuRii",
   "license": "MIT",
@@ -52,8 +58,8 @@
     ]
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@mariozechner/pi-tui": "*"
+    "@mariozechner/pi-coding-agent": "^0.62.0",
+    "@mariozechner/pi-tui": "^0.62.0"
   },
   "overrides": {
     "file-type": ">=21.3.1"
