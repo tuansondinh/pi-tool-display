@@ -24,9 +24,9 @@ interface RgbColor {
 
 const ADDITION_TINT_TARGET: RgbColor = { r: 84, g: 190, b: 118 };
 const DELETION_TINT_TARGET: RgbColor = { r: 232, g: 95, b: 122 };
-const ADD_ROW_BACKGROUND_MIX_RATIO = 0.24;
+const ADD_ROW_BACKGROUND_MIX_RATIO = 0.12;
 const REMOVE_ROW_BACKGROUND_MIX_RATIO = 0.12;
-const ADD_INLINE_EMPHASIS_MIX_RATIO = 0.44;
+const ADD_INLINE_EMPHASIS_MIX_RATIO = 0.26;
 
 function mixRgb(base: RgbColor, tint: RgbColor, ratio: number): RgbColor {
 	const clamped = Math.max(0, Math.min(1, ratio));
@@ -75,6 +75,33 @@ interface VisibleBackgroundCell {
 	background: string | null;
 }
 
+function isFiniteSgrParam(value: number | undefined): value is number {
+	return typeof value === "number" && Number.isFinite(value);
+}
+
+function readSgrBackgroundSequence(params: number[], index: number): string | undefined {
+	if (params[index] !== 48) {
+		return undefined;
+	}
+
+	const colorMode = params[index + 1];
+	if (colorMode === 5) {
+		const colorValue = params[index + 2];
+		return isFiniteSgrParam(colorValue) ? `\x1b[48;5;${colorValue}m` : undefined;
+	}
+
+	if (colorMode === 2) {
+		const red = params[index + 2];
+		const green = params[index + 3];
+		const blue = params[index + 4];
+		return isFiniteSgrParam(red) && isFiniteSgrParam(green) && isFiniteSgrParam(blue)
+			? `\x1b[48;2;${red};${green};${blue}m`
+			: undefined;
+	}
+
+	return undefined;
+}
+
 function updateBackgroundState(rawParams: string, currentBackground: string | null): string | null {
 	if (!rawParams.trim()) {
 		return null;
@@ -96,34 +123,11 @@ function updateBackgroundState(rawParams: string, currentBackground: string | nu
 			nextBackground = `\x1b[${param}m`;
 			continue;
 		}
-		if (param !== 48) {
-			continue;
-		}
 
-		const colorMode = params[index + 1];
-		if (colorMode === 5) {
-			const colorValue = params[index + 2];
-			if (typeof colorValue === "number" && Number.isFinite(colorValue)) {
-				nextBackground = `\x1b[48;5;${colorValue}m`;
-				index += 2;
-			}
-			continue;
-		}
-		if (colorMode === 2) {
-			const red = params[index + 2];
-			const green = params[index + 3];
-			const blue = params[index + 4];
-			if (
-				typeof red === "number"
-				&& typeof green === "number"
-				&& typeof blue === "number"
-				&& Number.isFinite(red)
-				&& Number.isFinite(green)
-				&& Number.isFinite(blue)
-			) {
-				nextBackground = `\x1b[48;2;${red};${green};${blue}m`;
-				index += 4;
-			}
+		const backgroundSequence = readSgrBackgroundSequence(params, index);
+		if (backgroundSequence) {
+			nextBackground = backgroundSequence;
+			index += backgroundSequence.includes("48;5;") ? 2 : 4;
 		}
 	}
 
