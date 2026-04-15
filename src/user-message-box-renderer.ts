@@ -40,7 +40,8 @@ interface CachedUserMessageMarkdownRenderer {
 const MIN_BORDER_WIDTH = 8;
 const TITLE_TEXT = " user ";
 const CONTENT_HORIZONTAL_PADDING_COLUMNS = 1;
-const USER_MESSAGE_PATCH_VERSION = 5;
+const USER_MESSAGE_TOP_MARGIN_LINES = 1;
+const USER_MESSAGE_PATCH_VERSION = 6;
 const MAX_USER_MESSAGE_MARKDOWN_TEXT_LENGTH = 100_000;
 const MAX_USER_MESSAGE_MARKDOWN_LINE_COUNT = 2_000;
 
@@ -289,6 +290,7 @@ export function patchNativeUserMessagePrototype(
         const theme = getTheme();
 
         return [
+          ...Array.from({ length: USER_MESSAGE_TOP_MARGIN_LINES }, () => ""),
           buildTopBorder(safeWidth, theme),
           ...paddedContentLines.map((renderLine) =>
             wrapContentLine(renderLine, safeWidth, theme),

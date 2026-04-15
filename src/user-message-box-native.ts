@@ -40,8 +40,4 @@ export default function registerNativeUserMessageBox(
     patchUserMessageRender(getTheme, isEnabled);
   });
 
-  pi.on("session_switch", async (_event, ctx) => {
-    activeTheme = ctx.ui.theme as unknown as UserMessageTheme;
-    patchUserMessageRender(getTheme, isEnabled);
-  });
 }
