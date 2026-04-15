@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-04-15
+
+### Added
+- `diffIndicatorMode` config option with three styles: `bars` (persistent vertical indicators), `classic` (+/- markers on first row only), and `none` (no indicator column)
+- Config modal dropdown for diff indicator style selection under "Diff indicators" setting
+
+### Changed
+- Updated `@mariozechner/pi-coding-agent` and `@mariozechner/pi-tui` peer dependencies to `^0.67.2`
+- Config path resolution now uses `getAgentDir()` API to correctly respect `PI_CODING_AGENT_DIR` environment variable
+- Diff renderer now supports mode-aware indicator glyph resolution (bars, classic, none)
+- Line prefix width calculations adjusted per indicator mode for accurate diff column alignment
+- Removed unused `session_switch` listener from native user message box registration
+- Added top margin line to native user message box rendering
+
+### Fixed
+- Diff indicator markers now render correctly across all indicator modes with proper continuation handling
+- Classic mode now shows +/- only on first visual row, with spacing on wrapped continuation lines
+
 ## [0.3.1] - 2026-04-01
 
 ### Changed
